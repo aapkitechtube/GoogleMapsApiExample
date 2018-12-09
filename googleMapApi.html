@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      * {
+          box-sizing: border-box;
+      }
+
+      #map {
+        height: 100%;
+      }
+
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .column {
+          float: left;
+          padding: 10px;
+          height: 100%;
+      }
+
+      .row:after {
+          content: "";
+          display: table;
+          clear: both;
+      }
+
+      input[type=text], select {
+          width: 100%;
+          padding: 12px 20px;
+          margin: 8px 0;
+          display: inline-block;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+      }
+
+      input[type=submit] {
+          width: 100%;
+          background-color: #4CAF50;
+          color: white;
+          padding: 14px 20px;
+          margin: 8px 0;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+      }
+
+      input[type=submit]:hover {
+          background-color: #45a049;
+      }
+
+    </style>
+  </head>
+  <body>
+
+    <div class="row" style="height: 100%; width: 100%">
+
+      <div class="column" style="width: 28%; background-color:#ffede1;">
+          <label for="fname">Enter the search entity</label>
+          <input type="text" id="searchEntity" name="searchEntity" placeholder="Search type..">      
+          <input type="submit" id="submit" value="Submit">
+      </div>
+
+      <div class="column" style="width: 1%;"></div>
+
+      <div id="map" class="column" style="width: 70%;"></div>
+      
+    </div>
+
+    <script>
+      
+      var map;
+      var infowindow;
+
+      function initMap() {
+
+        var searchEntity = document.getElementById("searchEntity").value;
+        var location = {lat: 22.5726, lng: 88.3639};
+
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: location,
+          zoom: 15
+        });
+
+        infowindow = new google.maps.InfoWindow();
+        var service = new google.maps.places.PlacesService(map);
+        service.nearbySearch({
+          location: location,
+          radius: 5000,
+          type: [searchEntity]
+        }, callback);
+      }
+
+      function callback(results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          for (var i = 0; i < results.length; i++) {
+            createMarker(results[i]);
+          }
+        }
+      }
+
+      function createMarker(place) {
+        var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.setContent(place.name);
+          infowindow.open(map, this);
+        });
+      }
+
+      document.getElementById("submit").onclick = initMap;
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCnDR9IUwZj7CdhfR9yxWV2Z&libraries=places"
+    async defer></script>
+    
+  </body>
+</html>
